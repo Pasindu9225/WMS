@@ -19,12 +19,10 @@ import java.time.LocalDateTime;
 @Filter(name = "tenantFilter", condition = "company_id = :companyId")
 public abstract class BaseEntity {
 
-    // Requirement: Every entity needs a Primary Key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Requirement 15: Tenant identification columns
     @Column(name = "group_id")
     private String groupId;
 

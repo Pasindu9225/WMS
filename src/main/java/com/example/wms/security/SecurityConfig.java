@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Requirement 6, 27
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final TenantFilter tenantFilter;
@@ -29,17 +29,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Requirement: Allow everything temporarily to bypass the 403 error
                         .anyRequest().permitAll()
                 );
 
-        // Keep this to ensure TenantContext is still set if a token is present
         http.addFilterBefore(tenantFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    @Bean // Requirement 23
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
