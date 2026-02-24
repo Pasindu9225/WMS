@@ -4,6 +4,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.hibernate.Session;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -15,12 +17,20 @@ public class TenantAspect {
     @PersistenceContext
     private EntityManager entityManager;
 
-    // Pointcut for all methods in classes within the repository package
     @Pointcut("execution(* com.example.wms.repository..*(..))")
     public void repositoryMethods() {}
 
     @Before("repositoryMethods()")
     public void beforeRepositoryMethod() {
+        // Requirement: Add group-level bypass logic for GROUP_ADMIN role
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_GROUP_ADMIN"))) {
+            // Bypass filtering if the user is a GROUP_ADMIN
+            return;
+        }
+
         String companyId = TenantContext.getCompanyId();
         if (companyId != null) {
             Session session = entityManager.unwrap(Session.class);

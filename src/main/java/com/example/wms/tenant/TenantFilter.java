@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.MDC;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority; // Required for Roles
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -37,9 +37,10 @@ public class TenantFilter extends OncePerRequestFilter {
                 String groupId = jwtUtils.getGroupIdFromToken(token);
                 String companyId = jwtUtils.getCompanyIdFromToken(token);
 
-                // Requirement 5 & 77: Extract roles from JWT and convert to Spring Authorities
+                // Requirement 5 & 77: Extract roles and ensure correct ROLE_ prefixing
                 List<String> roles = jwtUtils.getRolesFromToken(token);
                 List<SimpleGrantedAuthority> authorities = roles.stream()
+                        .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
@@ -50,7 +51,7 @@ public class TenantFilter extends OncePerRequestFilter {
                 // Requirement 38: Add MDC logging for tenant tracing
                 MDC.put("tenantId", companyId);
 
-                // Pass the extracted authorities (roles) to the authentication token
+                // Set authentication in context so @PreAuthorize can verify roles
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                         username, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
@@ -60,7 +61,7 @@ public class TenantFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } finally {
-            // Requirement 15, 37: Ensure tenant context is cleared after each request
+            // Requirement 15, 37: Always clear context to prevent memory leaks
             TenantContext.clear();
             MDC.remove("tenantId");
         }

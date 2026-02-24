@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @Getter
 @Setter
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class) // Requirement 4: Enable JPA auditing
 @FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "companyId", type = String.class))
 @Filter(name = "tenantFilter", condition = "company_id = :companyId")
 public abstract class BaseEntity {
