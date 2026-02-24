@@ -32,20 +32,17 @@ public class AuthController {
 
     @PostMapping("/signup")
     public String register(@RequestBody Map<String, String> request) {
-        // 1. Manually map fields since 'role' isn't in your standard User entity
         User user = new User();
         user.setUsername(request.get("username"));
         user.setPassword(passwordEncoder.encode(request.get("password")));
         user.setGroupId(request.get("groupId"));
         user.setCompanyId(request.get("companyId"));
 
-        // 2. Extract specific role from request
         String roleName = request.get("role");
         if (roleName == null) {
             throw new RuntimeException("Error: Role must be specified in the request.");
         }
 
-        // 3. Fetch the role from database and link it
         Role assignedRole = roleRepository.findByName(roleName)
                 .orElseThrow(() -> new RuntimeException("Error: Role '" + roleName + "' not found."));
 

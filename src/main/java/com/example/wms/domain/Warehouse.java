@@ -12,7 +12,6 @@ import org.hibernate.annotations.Where;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-// Requirement: Implement soft delete logic
 @SQLDelete(sql = "UPDATE warehouses SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 public class Warehouse extends BaseEntity {

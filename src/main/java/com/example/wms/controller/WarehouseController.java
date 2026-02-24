@@ -17,14 +17,12 @@ public class WarehouseController {
     }
 
     @GetMapping
-    // Use hasAnyAuthority for exact string match with database
     @PreAuthorize("hasAnyAuthority('ROLE_COMPANY_ADMIN', 'ROLE_OPERATOR')")
     public List<Warehouse> getAll() {
         return repository.findAll();
     }
 
     @PostMapping
-    // Use hasAuthority for exact match with database role
     @PreAuthorize("hasAuthority('ROLE_COMPANY_ADMIN')")
     public Warehouse create(@RequestBody Warehouse warehouse) {
         return repository.save(warehouse);

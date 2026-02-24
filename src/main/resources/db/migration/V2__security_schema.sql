@@ -1,4 +1,3 @@
--- Requirement: Design Company Group, Company, Warehouse core tables
 CREATE TABLE IF NOT EXISTS roles (
                                      id BIGSERIAL PRIMARY KEY,
                                      name VARCHAR(50) UNIQUE NOT NULL,

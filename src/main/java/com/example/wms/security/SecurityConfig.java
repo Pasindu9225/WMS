@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Requirement 5: Enable method-level security for RBAC
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final TenantFilter tenantFilter;
@@ -29,12 +29,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // Requirement: Public access for login/signup
-                        .requestMatchers("/api/warehouses/**").authenticated() // Requirement: Protected warehouse routes
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/warehouses/**").authenticated()
                         .anyRequest().authenticated()
                 );
 
-        // Requirement 15: Add tenant filter before authentication
         http.addFilterBefore(tenantFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

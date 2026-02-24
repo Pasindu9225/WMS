@@ -22,12 +22,10 @@ public class TenantAspect {
 
     @Before("repositoryMethods()")
     public void beforeRepositoryMethod() {
-        // Requirement: Add group-level bypass logic for GROUP_ADMIN role
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null && auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_GROUP_ADMIN"))) {
-            // Bypass filtering if the user is a GROUP_ADMIN
             return;
         }
 

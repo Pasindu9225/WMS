@@ -18,12 +18,11 @@ public class JwtUtils {
     private final String SECRET_KEY = "9a67475d459d4c1c93a93a1234567890abcdef1234567890abcdef1234567890";
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
-    // Requirement 4 & 77: Generate token with tenant IDs AND Roles
     public String generateToken(String username, String groupId, String companyId, List<String> roles) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("groupId", groupId);
         claims.put("companyId", companyId);
-        claims.put("roles", roles); // This allows @PreAuthorize to work
+        claims.put("roles", roles);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -64,7 +63,6 @@ public class JwtUtils {
         return extractAllClaims(token).get("companyId", String.class);
     }
 
-    // New helper to extract roles for the Security Filter
     @SuppressWarnings("unchecked")
     public List<String> getRolesFromToken(String token) {
         return extractAllClaims(token).get("roles", List.class);
